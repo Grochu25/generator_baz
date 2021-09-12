@@ -1,8 +1,11 @@
 package mainPackage;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.time.*;
 import java.util.*;
+import java.util.stream.*;
 
 import javax.swing.JOptionPane;
 
@@ -26,15 +29,16 @@ public class Generator
 	public Generator()
 	{
 		quotes = false;
-		imiona = new ArrayList<String>(226);
-		nazwiska = new ArrayList<String>(754);
-		ulice = new ArrayList<String>(41);
-		miasta = new ArrayList<String>(16);
+		imiona = new ArrayList<String>(fillArrays("sources/imiona.txt"));
+		nazwiska = new ArrayList<String>(fillArrays("sources/nazwiska.txt"));
+		ulice = new ArrayList<String>(fillArrays("sources/ulice.txt"));
+		miasta = new ArrayList<String>(fillArrays("sources/miasta.txt"));
 		rand = new Random();
-		fillArrays("sources/imiona.txt", imiona);
-		fillArrays("sources/nazwiska.txt", nazwiska);
-		fillArrays("sources/ulice.txt", ulice);
-		fillArrays("sources/miasta.txt", miasta);
+	}
+	
+	public static void main(String[] args)
+	{
+		Generator test = new Generator();
 	}
 	
 	/*
@@ -42,17 +46,21 @@ public class Generator
 	 * @param fileName œcie¿ka do pliku
 	 * @param list nazwa listy do której wpisane s¹ dane
 	 */
-	public void fillArrays(String fileName, ArrayList<String> list)
+	public List<String> fillArrays(String fileName)
 	{
-		try(Scanner in = new Scanner(new File(fileName),"UTF-8"))
+		List<String> list;
+		try
 		{
-			while(in.hasNextLine())
-			{
-				String line = in.nextLine();
-				list.add(line);
-			}
+			String contents = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
+			Stream<String> variables = Stream.of(contents.split("(\\PL+[\\s])"));
+			list = variables.collect(Collectors.toList());
+			return list;
 		}
-		catch(FileNotFoundException e) {errorFile(fileName);}
+		catch(IOException iex)
+		{
+			errorFile(fileName);
+		}
+		return null;
 	}
 	
 	/*
