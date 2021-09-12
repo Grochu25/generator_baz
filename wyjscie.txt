@@ -1,0 +1,10 @@
+1; Aurelia; Kwiatkowski; Kobieta; 85120630620; Rybnik
+2; Nela; Netkowski; Kobieta; 93102954065; Zakopane
+3; Julita; Szczesny; Kobieta; 13211970090; Poznan
+4; Iwo; Osinski; Mezczyzna; 79080450305; Zabrze
+5; Wiktor; Pietraszek; Mezczyzna; 83071898660; Zielona Gora
+6; Blanka; Paszewski; Kobieta; 15252386229; Zakopane
+7; Nadia; Korzeniak; Kobieta; 92100131486; Katowice
+8; Dawid; Drewnowicz; Mezczyzna; 18232211153; Tczew
+9; Magdalena; Slabowski; Kobieta; 19322946563; Poznan
+10; Kinga; Wachowicz; Kobieta; 96030882100; Zabrze
