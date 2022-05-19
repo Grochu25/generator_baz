@@ -20,18 +20,14 @@ public class Cutter
 	{
 		sb = new StringBuilder();
 		this.file = file;
-		//System.out.println(file.toString());
-		//System.out.println("bruh1");
 	}
 	
 	//metoda g³ówna klasy
 	public void start()
 	{
-		//System.out.println("bruh2");
 		try(Scanner in = new Scanner(file)){
 			while(in.hasNext())
 			{
-				//System.out.println("bruh3");
 				line = in.nextLine();
 				sb.append(changer(line)+"\n");
 			}
@@ -49,7 +45,6 @@ public class Cutter
 	 */
 	private String changer(String text)
 	{
-		//System.out.println("bruh2");
 		int start = 0;
 		StringBuilder sb2 = new StringBuilder();
 		for(int i=0;i<text.length();i++)
@@ -80,7 +75,6 @@ public class Cutter
 			else
 				sb2.append(text.charAt(i));
 		}
-		//System.out.println("bruh"+sb2.toString());
 		return sb2.toString();
 	}
 }

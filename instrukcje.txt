@@ -1,0 +1,7 @@
+-plik Generator.exe musi znajdować się w tej samej lokalizacji co folder sources
+-w przypadku usunięcia któregokolwiek pliku z folderu sources, program nie zadziała poprawnie
+-pliki tekstowe z folderu sources można modyfikować, tzn. dodawać lub usuwać dane, ale pliki NIGDY NIE MOGĄ BYĆ PUSTE (uniemożliwi to działanie programu)
+-pola "e-mail", "płeć" i "PESEL" generowane są z pól "imię", "nazwisko" lub "data urodzenia", stąd np. pola "IMIĘ GŁÓWNE" oraz "IMIĘ DODATKOWE"
+-dane wyjściowe (póki co) pojawiają się w tej samej lokalizacji co plik exe, w pliku "wyjście.txt"
+
+Porgram na licencji Beerware

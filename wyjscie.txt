@@ -1,10 +1,3 @@
-('Kamila', 'Partyka'),
-('Marcel', 'Pajzderski'),
-('Antonina', 'Stoch'),
-('Marianna', 'Butrymowicz'),
-('Leonard', 'Kasperlik'),
-('Martyna', 'Waszkiewicz'),
-('Juliusz', 'Kamienski'),
-('Dorota', 'Rubinowicz'),
-('Malwina', 'Gawron'),
-('Matylda', 'Budzynowski');
+('Bolka i Lolka 59'),
+('Kotucza 98'),
+('Lipowa  187');

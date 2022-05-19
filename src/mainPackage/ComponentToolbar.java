@@ -1,10 +1,15 @@
 package mainPackage;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
+import java.io.*;
+import java.nio.file.Paths;
 import java.text.*;
 import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jdatepicker.impl.*;
 import java.util.*;
@@ -22,6 +27,8 @@ public class ComponentToolbar extends JTabbedPane
 	private JButton birthDateRange;
 	private JSpinner rangeStart;
 	private JSpinner rangeEnd;
+	private JPanel customDataPanel;
+	private boolean uruchomienie = true;
 	
 	public ComponentToolbar(PickComp mainComp)
 	{
@@ -30,6 +37,7 @@ public class ComponentToolbar extends JTabbedPane
 		addNameCard();
 		addAdressCard();
 		addDateCard();
+		addCustomCard();
 	}
 	
 	private void addBasicCard()
@@ -104,7 +112,7 @@ public class ComponentToolbar extends JTabbedPane
 		catch(NoSuchMethodException e) {e.printStackTrace();}});
 		
 		JButton peselButt = new JButton("PESEL");
-		peselButt.addActionListener(event->{try{mainComp.addComp("PESEL ",Generator.class.getMethod("getPESEL", String.class));}
+		peselButt.addActionListener(event->{try{mainComp.addComp("PESEL ",Generator.class.getMethod("getPESEL", String.class, String.class));}
 		catch(NoSuchMethodException e) {e.printStackTrace();}});
 		
 		topPanel.add(names);
@@ -145,6 +153,60 @@ public class ComponentToolbar extends JTabbedPane
 		topPanel.add(dateComp());
 		
 		addTab("Daty",topPanel);
+	}
+	
+	private void addCustomCard()
+	{
+		JPanel upperPanel = new JPanel();
+		JPanel lowerPanel = new JPanel(); lowerPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK));
+		customDataPanel = new JPanel();
+		customDataPanel.setLayout(new GridLayout(2,1));
+		
+		JButton customAddButton = new JButton("Dodaj pole");
+		customAddButton.addActionListener(event->{
+			JFileChooser chooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("pliki tekstowe","txt");
+			chooser.setFileFilter(filter);
+			if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				String  inputName = (String) JOptionPane.showInputDialog(this,"Podaj nazwê dla nowej kategorii pola: ","dodawanie kategorii",JOptionPane.PLAIN_MESSAGE,null,null,null);
+				
+				JButton nb = createAdditionalButton(chooser.getSelectedFile().getPath(), inputName);
+				if(nb!=null)
+					upperPanel.add(nb);
+				EventQueue.invokeLater(()->updateUI());
+			}
+		});
+		lowerPanel.add(customAddButton);
+		
+		JButton customDeleteButton = new JButton("Usuñ pole");
+		customDeleteButton.addActionListener((event)->{if(upperPanel.getComponentCount()>0)new CustomsMenu(upperPanel);});
+		lowerPanel.add(customDeleteButton);
+		
+		File sources = new File("sources/customs");  
+		for(String file : sources.list())
+			if(file.endsWith(".txt"))
+			{
+				upperPanel.add(createAdditionalButton("sources/customs/"+file,file.substring(0, file.length()-4)));
+			}
+		customDataPanel.add(upperPanel);
+		customDataPanel.add(lowerPanel);
+
+		uruchomienie = false;
+		addTab("W³asne dane",customDataPanel);
+		
+	}
+	
+	private JButton createAdditionalButton(String uri, String name)
+	{
+		int x = Generator.addToCustoms(uri, name, uruchomienie);
+		if(x<0) return null;
+		//String[] types = {"Tekstowa","Numeryczna"};
+		//JOptionPane.showInputDialog(this,"Wybierz typ pola:","typ pola",JOptionPane.PLAIN_MESSAGE,null,types,null);
+		JButton custom = new JButton(name);
+		custom.addActionListener(ev->{try{mainComp.addComp(name,x,Generator.class.getMethod("getCustom", int.class));}
+		catch(NoSuchMethodException e) {e.printStackTrace();}});
+		return custom;
 	}
 	
 	public LocalDate getStartDate()

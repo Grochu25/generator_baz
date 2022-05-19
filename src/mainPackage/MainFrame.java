@@ -2,9 +2,10 @@ package mainPackage;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /*
- *  @version 1.2 
+ *  @version 1.3
  *  @author Grochu
  */
 public class MainFrame extends JFrame
@@ -13,6 +14,9 @@ public class MainFrame extends JFrame
 	private int windowWidth;
 	private PickComp mainPanel;
 	private ComponentToolbar topBar;
+	private DBaseConfigFrame DBConfig;
+	private JPanel bottom;
+	protected CustomMenuBar menu;
 	
 	/*
 	 * Program g³ówny
@@ -42,21 +46,27 @@ public class MainFrame extends JFrame
 		quickScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		quickScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		
+		bottom = endComp();
+		
 		mainPanel.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.BLACK));
 		add(quickScroll, BorderLayout.NORTH);
 		add(mainPanel, BorderLayout.CENTER);
-		add(endComp(), BorderLayout.SOUTH);
+		add(bottom, BorderLayout.SOUTH);
+		
+		DBConfig = new DBaseConfigFrame();
+		menu = new CustomMenuBar(DBConfig, mainPanel);
+		setJMenuBar(menu);
 	}
 	
 	/*
 	 * metoda potrzebna do aktualizacji równie¿ topBaru
 	 */
-	//TODO: sprawdziæ spójnoœæ rysowania i odœwie¿ania z w¹tkiem dystrybucji zdarzeñ
-	//to jest ten od wyœwietlania interfacu (meody EventQueue)
 	public void repaint()
 	{
+		EventQueue.invokeLater(()->{
 		topBar.repaint();
 		super.repaint();
+		});
 	}
 	
 	/*
@@ -77,21 +87,34 @@ public class MainFrame extends JFrame
 	private JPanel endComp()
 	{
 		JPanel panel = new JPanel();
-		GridLayout gl = new GridLayout(1,5,2,0);
-		panel.setLayout(gl);
-		panel.setBorder(BorderFactory.createEmptyBorder(0, windowWidth/6, 0, windowWidth/6));
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
 		
-		JSpinner editor = new JSpinner();
-		editor.setValue(1);
+		SpinnerModel model = new SpinnerNumberModel(1,0,1000,1);
+		JSpinner editor = new JSpinner(model);
 		JButton submit = new JButton("Wykonaj");
-		submit.addActionListener(event->{mainPanel.gener((int) editor.getValue());
+		submit.addActionListener(event->{mainPanel.setOut((int) editor.getValue());
 			
 		});
 		
-		panel.add(editor);
-		gl.setHgap(10);
-		panel.add(submit);
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.ipadx = 40;
+		gbc.insets = new Insets(0,10,0,10);
+		gbc.gridx = 1;
+		panel.add(editor, gbc);
+		gbc.gridx = 2;
+		panel.add(submit, gbc);
 		return panel;
+	}
+	
+	public static void sqlMessage(String message)
+	{
+		JOptionPane.showConfirmDialog(null, message, "B³¹d SQL", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public static void errorMessage(String message)
+	{
+		JOptionPane.showConfirmDialog(null, message, "B³¹d", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 	}
 	
 	/*private class MouseMotionHandler implements MouseMotionListener

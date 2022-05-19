@@ -7,7 +7,7 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /*
  * Klasa wczytuj¹ca zawartoœæ plików tekstowych z danymi
@@ -19,8 +19,10 @@ public class Generator
 	private ArrayList<String> nazwiska;
 	private ArrayList<String> ulice;
 	private ArrayList<String> miasta;
+	private static ArrayList<ArrayList<String>> customs = new ArrayList<>();
 	private Random rand;
 	private static int LP = 0;
+	private static int customIterator = 0;
 	private boolean quotes;
 	
 	/*
@@ -36,9 +38,35 @@ public class Generator
 		rand = new Random();
 	}
 	
-	public static void main(String[] args)
+	public static int addToCustoms(String src, String name, boolean kontrola)
 	{
-		Generator test = new Generator();
+		File addFile = new File("sources/customs/"+name+".txt");
+		if(addFile.exists() && !kontrola)
+		{
+			MainFrame.errorMessage("Pole o tej nazwie ju¿ istnieje");
+			return -1;
+		}
+		try {
+			Files.write(Paths.get("sources/customs/"+name+".txt"), Files.readAllBytes(Paths.get(src)), StandardOpenOption.CREATE);
+		}catch(IOException e) {e.printStackTrace(); return -1;}
+		
+		customs.add(new ArrayList<String>(fillArrays("sources/customs/"+name+".txt")));
+		
+		return customIterator++;
+	}
+	
+	public static void deleteFromCustoms(String name)
+	{
+		File deleted = new File("sources/customs/"+name);
+		if(deleted.exists())
+		{
+			deleted.delete();
+		}
+	}
+	
+	public static void setOrdinalNumber(int x)
+	{
+		LP = x;
 	}
 	
 	/*
@@ -46,7 +74,7 @@ public class Generator
 	 * @param fileName œcie¿ka do pliku
 	 * @param list nazwa listy do której wpisane s¹ dane
 	 */
-	public List<String> fillArrays(String fileName)
+	public static List<String> fillArrays(String fileName)
 	{
 		List<String> list;
 		try
@@ -173,7 +201,6 @@ public class Generator
 	 * Okreœla p³eæ na podstawie imienia
 	 * @param name imiê osoby
 	 */
-	//TODO: dodaæ wersjê metody bez imienia
 	public String getGender(String name)
 	{
 		if(name.endsWith("a"))
@@ -192,8 +219,7 @@ public class Generator
 	 * Generuje pesel na podstawie daty urodzenia
 	 * @param birth data urodzenia jako tekst
 	 */
-	//TODO: przerobiæ metodê na lepsz¹ obsu³ugê dat i dodaæ wariant pustej daty
-	public String getPESEL(String birth)
+	public String getPESEL(String birth, String gender)
 	{
 		int shift = (quotes)?1:0;
 		StringBuilder pesel = new StringBuilder();
@@ -202,8 +228,37 @@ public class Generator
 		if(month<10)pesel.append("0");
 		pesel.append(month);
 		pesel.append(birth.substring(8+shift,10+shift));
-		pesel.append(rand.nextInt(88888)+11111);
+		pesel.append(rand.nextInt(888)+111);
+		if(gender.substring(0+shift,1+shift).equals("M"))
+			pesel.append((rand.nextInt(5)*2)+1);
+		else
+			pesel.append((rand.nextInt(5)*2));
+		pesel.append(controlSum(pesel.toString()));
 		return pesel.toString();
+	}
+	
+	public String getCustom(int customNumber)
+	{
+		int index = rand.nextInt(customs.get(customNumber).size());
+		if(quotes)return "'"+customs.get(customNumber).get(index)+"'";
+		return customs.get(customNumber).get(index);
+	}
+	
+	/*
+	 * Funkcja pomocnicza wyliczaj¹ca sumê kontroln¹ z PESELu
+	 * @param pesel 10-cyfrowy pocz¹tek pseslu
+	 */
+	private int controlSum(String pesel)
+	{
+		int suma = 0;
+		for(int i=0;i<10;i++)
+		{
+			if(i==0 || i==4 || i==8) suma += Integer.parseInt(pesel.substring(i,i+1))*1 %  10;
+			if(i==1 || i==5 || i==9) suma += Integer.parseInt(pesel.substring(i,i+1))*3 %  10;
+			if(i==2 || i==6) suma += Integer.parseInt(pesel.substring(i,i+1))*7 %  10;
+			if(i==3 || i==7) suma += Integer.parseInt(pesel.substring(i,i+1))*9 %  10;
+		}
+		return 10 - suma % 10;
 	}
 	
 	/*
@@ -254,7 +309,7 @@ public class Generator
 	}
 	
 	//informacja zwrotna o b³êdzie odczytu któregoœ z plików
-	private void errorFile(String name)
+	private static void errorFile(String name)
 	{
 		JOptionPane.showMessageDialog(null, "Generator napotka³ b³¹d przy wczytywaniu pliku "+name, "B³¹d odczytu",  JOptionPane.WARNING_MESSAGE);
 	}
